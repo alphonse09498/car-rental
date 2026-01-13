@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Propelize - Inscription</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Style minimal si styles.css n'existe pas */
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Créer un compte</h1>
+    <form id="registerForm" method="POST" action="/register">
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input type="text" id="username" name="username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Adresse Email</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Rôle</label>
+        <select id="role" name="role" required>
+          <option value="">-- Choisir un rôle --</option>
+          <option value="admin">Admin</option>
+          <option value="user">Utilisateur</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">S'inscrire</button>
+    </form>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    /* istanbul ignore next */
+const form = document.getElementById('registerForm');
+const messageDiv = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+  console.log('Données du formulaire:', data);
+  try {
+    const response = await fetch('auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+   
+    const result = await response.json();
+    console.log('Résultat de l’inscription:', result);
+    if (response.ok || response.created) {
+      messageDiv.style.color = 'green';
+      messageDiv.textContent = 'Inscription réussie !';
+      const { accessToken, refreshToken, expiresIn } = result.tokens;
+      const { user } = result.data;
+
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('expiresIn', expiresIn);
+      
+      setTimeout(() => window.location.href = '/vehicules', 1000);
+    } else {
+      messageDiv.style.color = 'red';
+      messageDiv.textContent = result.message || 'Erreur lors de l’inscription';
+
+      
+
+      // Stocker les infos utilisateur si besoin
+      localStorage.setItem('user', JSON.stringify(user));
+
+
+    }
+  } catch (err) {
+    console.error('Erreur lors de l’inscription:', err);
+    messageDiv.textContent = 'erreur de connexion, veuillez réessayer';
+  }
+});
+
+  </script>
+</body>
+</html>

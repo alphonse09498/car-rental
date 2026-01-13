@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propelize - Gestion des Véhicules</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles-vehicle.css">
+ 
+</head>
+<body>
+  <header>
+    <nav>
+      <div>
+        <a href="/vehicules" class="active">Véhicules</a>
+        <a href="/users">Utilisateurs</a>
+      </div>
+      <button id="logoutBtn">Déconnexion</button>
+    </nav>
+  </header>
+  
+  <main>
+    <div class="header-actions">
+      <h1>Gestion des véhicules</h1>
+      <button id="addVehicleBtn" class="btn btn-primary" name="addVehicle">
+        <i class="fas fa-plus"></i> Ajouter un véhicule
+      </button>
+    </div>
+    
+    <div class="search-filter">
+      <div>
+        <input type="text" id="searchInput" placeholder="Rechercher...">
+      </div>
+      <div>
+        <select id="typeFilter">
+          <option value="">Tous les types</option>
+          <option value="car">Voiture</option>
+          <option value="van">Camionnette</option>
+        </select>
+      </div>
+      <div>
+        <select id="availabilityFilter">
+          <option value="">Tous</option>
+          <option value="true">Disponible</option>
+          <option value="false">Non disponible</option>
+        </select>
+      </div>
+      <div>
+        <input type="number" id="maxPriceFilter" placeholder="Prix max/jour">
+      </div>
+    </div>
+    
+    <div class="vehicle-list" id="vehicleList">
+      <!-- Véhicules chargés dynamiquement -->
+    </div>
+  </main>
+  
+  <!-- Modal pour ajouter/modifier un véhicule -->
+  <div class="modal" id="vehicleModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Ajouter un véhicule</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="vehicleForm">
+          <input type="hidden" id="vehicleId">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="make">Marque *</label>
+              <input type="text" id="make" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="model">Modèle *</label>
+              <input type="text" id="model" class="form-control" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="year">Année *</label>
+              <input type="number" id="year" class="form-control" min="1900" max="2025" required>
+            </div>
+            <div class="form-group">
+              <label for="type">Type *</label>
+              <select id="type" class="form-control" required>
+                <option value="">Sélectionner un type</option>
+                <option value="car">Voiture</option>
+                <option value="van">Camionnette</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pricePerDay">Prix par jour (FCFA) *</label>
+              <input type="number" id="pricePerDay" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="mileage">Kilométrage</label>
+              <input type="number" id="mileage" class="form-control" min="0">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="registrationNumber">Numéro d'immatriculation *</label>
+              <input type="text" id="registrationNumber" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="location">Localisation *</label>
+              <input type="text" id="location" class="form-control" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastServiceDate">Date du dernier entretien</label>
+            <input type="date" id="lastServiceDate" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" id="isAvailable" class="form-check-input">
+              <label for="isAvailable">Disponible</label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Équipements</label>
+            <div class="features-container" id="featuresContainer">
+              <!-- Les équipements seront ajoutés ici dynamiquement -->
+            </div>
+            <div class="feature-input">
+              <input type="text" id="newFeature" class="form-control" placeholder="Ajouter un équipement">
+              <button type="button" id="addFeatureBtn" class="btn btn-primary">Ajouter</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelBtn" class="btn">Annuler</button>
+        <button id="saveVehicleBtn" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal de confirmation de suppression -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmation</h2>
+        <button class="modal-close" id="closeConfirmModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">Êtes-vous sûr de vouloir supprimer ce véhicule ?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelConfirmBtn" class="btn">Annuler</button>
+        <button id="confirmBtn" class="btn btn-danger">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    /* istanbul ignore next */
+document.addEventListener('DOMContentLoaded', function() {
+  // Éléments du DOM
+  const vehicleList = document.getElementById('vehicleList');
+  const addVehicleBtn = document.getElementById('addVehicleBtn');
+  const vehicleModal = document.getElementById('vehicleModal');
+  const confirmModal = document.getElementById('confirmModal');
+  const vehicleForm = document.getElementById('vehicleForm');
+  const searchInput = document.getElementById('searchInput');
+  const typeFilter = document.getElementById('typeFilter');
+  const availabilityFilter = document.getElementById('availabilityFilter');
+  const maxPriceFilter = document.getElementById('maxPriceFilter');
+  
+
+  const token = localStorage.getItem('accessToken');
+
+
+  // Variables d'état
+  let vehicles = [];
+  let currentVehicleId = null;
+  let features = [];
+  
+  // Initialisation
+  fetchVehicles();
+  setupEventListeners();
+  
+  // Fonctions
+  
+  function setupEventListeners() {
+    // Boutons modaux
+    addVehicleBtn.addEventListener('click', openAddModal);
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    document.getElementById('closeConfirmModal').addEventListener('click', closeConfirmModal);
+    document.getElementById('cancelConfirmBtn').addEventListener('click', closeConfirmModal);
+    
+    // Gestion des équipements
+    document.getElementById('addFeatureBtn').addEventListener('click', addFeature);
+    
+    // Sauvegarde du véhicule
+    document.getElementById('saveVehicleBtn').addEventListener('click', saveVehicle);
+    
+    // Filtres
+    searchInput.addEventListener('input', filterVehicles);
+    typeFilter.addEventListener('change', filterVehicles);
+    availabilityFilter.addEventListener('change', filterVehicles);
+    maxPriceFilter.addEventListener('input', filterVehicles);
+    
+    // Déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+  }
+  
+  function fetchVehicles() {
+    fetch('/vehicles', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`  
+        }
+    })
+    .then(response => {
+        if (response.status === 401) {
+            alert('Session expirée. Veuillez vous reconnecter.');      
+            // window.location.href = '/login';
+            return;
+        }
+        if (!response.ok) {
+            throw new Error('Erreur HTTP');
+        }
+        return response.json();
+    })
+    .then(data => {
+        vehicles = data;
+        renderVehicleList(vehicles);
+    })
+    .catch(error => {
+        console.error('Erreur lors de la récupération des véhicules:', error);
+        alert('Une erreur est survenue lors de la récupération des véhicules');
+    });
+    }
+
+  
+  function renderVehicleList(vehiclesToRender) {
+    vehicleList.innerHTML = '';
+    
+    if (vehiclesToRender.length === 0) {
+      vehicleList.innerHTML = '<p>Aucun véhicule trouvé.</p>';
+      return;
+    }
+    
+    vehiclesToRender.forEach(vehicle => {
+      const vehicleCard = document.createElement('div');
+      vehicleCard.className = 'vehicle-card';
+      
+      const availabilityClass = vehicle.isAvailable ? 'available' : 'unavailable';
+      const availabilityText = vehicle.isAvailable ? 'Disponible' : 'Non disponible';
+      
+      vehicleCard.innerHTML = `
+        <div class="vehicle-image">
+          <i class="fas fa-${vehicle.type === 'car' ? 'car' : 'truck'}"></i>
+        </div>
+        <div class="vehicle-details">
+          <h3 class="vehicle-title">${vehicle.make} ${vehicle.model}</h3>
+          <p class="vehicle-info">${vehicle.year} • ${vehicle.type === 'car' ? 'Voiture' : 'Camionnette'}</p>
+          <p class="vehicle-info">${vehicle.registrationNumber}</p>
+          <p class="vehicle-price">${vehicle.pricePerDay.toFixed(2)} FCFA/jour</p>
+          <p class="vehicle-info">Localisation: ${vehicle.location}</p>
+          <span class="vehicle-availability ${availabilityClass}">${availabilityText}</span>
+          
+          <div class="vehicle-actions">
+            <button class="btn btn-primary edit-btn" data-id="${vehicle._id}">
+              <i class="fas fa-edit"></i> Modifier
+            </button>
+            <button class="btn btn-danger delete-btn" data-id="${vehicle._id}">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+      `;
+      
+      vehicleList.appendChild(vehicleCard);
+    });
+    
+    // Ajout des écouteurs d'événements pour les boutons d'action
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => openEditModal(e.target.dataset.id));
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => openDeleteModal(e.target.dataset.id));
+    });
+  }
+  
+  function openAddModal() {
+    document.getElementById('modalTitle').textContent = 'Ajouter un véhicule';
+    document.getElementById('vehicleId').value = '';
+    vehicleForm.reset();
+    features = [];
+    renderFeatures();
+    
+    // Réinitialiser la disponibilité à true par défaut
+    document.getElementById('isAvailable').checked = true;
+    
+    vehicleModal.style.display = 'flex';
+  }
+  
+  function openEditModal(vehicleId) {
+    const vehicle = vehicles.find(v => v._id === vehicleId);
+    if (!vehicle) return;
+    
+    document.getElementById('modalTitle').textContent = 'Modifier le véhicule';
+    document.getElementById('vehicleId').value = vehicle._id;
+    document.getElementById('make').value = vehicle.make;
+    document.getElementById('model').value = vehicle.model;
+    document.getElementById('year').value = vehicle.year;
+    document.getElementById('type').value = vehicle.type;
+    document.getElementById('pricePerDay').value = vehicle.pricePerDay;
+    document.getElementById('mileage').value = vehicle.mileage || '';
+    document.getElementById('registrationNumber').value = vehicle.registrationNumber;
+    document.getElementById('location').value = vehicle.location;
+    document.getElementById('isAvailable').checked = vehicle.isAvailable;
+    
+    if (vehicle.lastServiceDate) {
+      const lastServiceDate = new Date(vehicle.lastServiceDate);
+      document.getElementById('lastServiceDate').value = lastServiceDate.toISOString().split('T')[0];
+    } else {
+      document.getElementById('lastServiceDate').value = '';
+    }
+    
+    features = [...vehicle.features];
+    renderFeatures();
+    
+    vehicleModal.style.display = 'flex';
+  }
+  
+  function openDeleteModal(vehicleId) {
+    currentVehicleId = vehicleId;
+    confirmModal.style.display = 'flex';
+  }
+  
+  function closeModal() {
+    vehicleModal.style.display = 'none';
+  }
+  
+  function closeConfirmModal() {
+    confirmModal.style.display = 'none';
+  }
+  
+  function addFeature() {
+    const featureInput = document.getElementById('newFeature');
+    const feature = featureInput.value.trim();
+    
+    if (feature && !features.includes(feature)) {
+      features.push(feature);
+      renderFeatures();
+      featureInput.value = '';
+    }
+  }
+  
+  function removeFeature(index) {
+    features.splice(index, 1);
+    renderFeatures();
+  }
+  
+  function renderFeatures() {
+    const container = document.getElementById('featuresContainer');
+    container.innerHTML = '';
+    
+    features.forEach((feature, index) => {
+      const tag = document.createElement('div');
+      tag.className = 'feature-tag';
+      tag.innerHTML = `
+        ${feature}
+        <button type="button" onclick="removeFeature(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      container.appendChild(tag);
+    });
+  }
+  
+  function saveVehicle() {
+    const vehicleId = document.getElementById('vehicleId').value;
+    const isEdit = !!vehicleId;
+    
+    const vehicleData = {
+      make: document.getElementById('make').value,
+      model: document.getElementById('model').value,
+      year: parseInt(document.getElementById('year').value),
+      type: document.getElementById('type').value,
+      pricePerDay: parseFloat(document.getElementById('pricePerDay').value),
+      mileage: parseInt(document.getElementById('mileage').value) || undefined,
+      registrationNumber: document.getElementById('registrationNumber').value,
+      location: document.getElementById('location').value,
+      isAvailable: document.getElementById('isAvailable').checked,
+      features: features,
+      lastServiceDate: document.getElementById('lastServiceDate').value || undefined
+    };
+    
+    // Validation simple
+    if (!vehicleData.make || !vehicleData.model || !vehicleData.year || !vehicleData.type || 
+        !vehicleData.pricePerDay || !vehicleData.registrationNumber || !vehicleData.location) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    
+    const url = isEdit ? `/vehicles/${vehicleId}` : '/vehicles';
+    const method = isEdit ? 'PUT' : 'POST';
+    
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        },
+      body: JSON.stringify(vehicleData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw err; });
+      }
+      return response.json();
+    })
+    .then(() => {
+      closeModal();
+      fetchVehicles();
+      alert(`Véhicule ${isEdit ? 'modifié' : 'ajouté'} avec succès`);
+    })
+    .catch(error => {
+      console.error('Erreur:', error);
+      alert(error.message || 'Une erreur est survenue');
+    });
+  }
+  
+  function deleteVehicle() {
+    fetch(`/vehicles/${currentVehicleId}`, {
+        method: 'DELETE',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.status === 401) { 
+            alert('Session expirée. Veuillez vous reconnecter.');
+            window.location.href = '/login';
+            return;
+        }
+        if (!response.ok) {
+            throw new Error('Erreur lors de la suppression');
+            return
+        }
+        closeConfirmModal();
+        fetchVehicles();
+        alert('Véhicule supprimé avec succès');
+         
+    })
+    .then(() => {
+       
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert(error.message || 'Une erreur est survenue lors de la suppression');
+    });
+}
+
+  
+  function filterVehicles() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const typeValue = typeFilter.value;
+    const availabilityValue = availabilityFilter.value;
+    const maxPriceValue = maxPriceFilter.value ? parseFloat(maxPriceFilter.value) : null;
+    
+    const filtered = vehicles.filter(vehicle => {
+      const matchesSearch = 
+        vehicle.make.toLowerCase().includes(searchTerm) || 
+        vehicle.model.toLowerCase().includes(searchTerm) ||
+        vehicle.registrationNumber.toLowerCase().includes(searchTerm);
+      
+      const matchesType = typeValue ? vehicle.type === typeValue : true;
+      const matchesAvailability = availabilityValue ? vehicle.isAvailable.toString() === availabilityValue : true;
+      const matchesPrice = maxPriceValue ? vehicle.pricePerDay <= maxPriceValue : true;
+      
+      return matchesSearch && matchesType && matchesAvailability && matchesPrice;
+    });
+    
+    renderVehicleList(filtered);
+  }
+  
+  function logout() {
+    // Implémentez la logique de déconnexion ici
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(() => {
+      window.location.href = '/login';
+    })
+    .catch(error => {
+      console.error('Erreur lors de la déconnexion:', error);
+    });
+  }
+  
+  // Exposer certaines fonctions au scope global pour les boutons dans les templates
+  window.removeFeature = removeFeature;
+  
+  // Confirmation de suppression
+  document.getElementById('confirmBtn').addEventListener('click', deleteVehicle);
+});
+  </script>
+</body>
+</html>
