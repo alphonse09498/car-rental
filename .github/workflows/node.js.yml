@@ -12,21 +12,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x] # Version plus stable pour éviter les conflits avec certaines dépendances
+        node-version: [18.x]
 
     services:
       mongo:
         image: mongo:5.0
         ports:
           - 27017:27017
-        env:
-          MONGO_INITDB_ROOT_USERNAME: admin
-          MONGO_INITDB_ROOT_PASSWORD: password
-        options: >-
-          --health-cmd "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        # On ne définit pas de mot de passe ici pour simplifier les tests en CI
 
     steps:
     - uses: actions/checkout@v4
@@ -48,7 +41,7 @@ jobs:
     - name: Create .env file for tests
       run: |
         cat <<EOF > .env
-        MONGO_URL=mongodb://admin:password@localhost:27017/car_rental_test?authSource=admin
+        MONGO_URL=mongodb://localhost:27017/car_rental_test
         JWT_SECRET=${{ secrets.JWT_SECRET }}
         JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
         JWT_EXPIRES_IN=15m
@@ -57,10 +50,16 @@ jobs:
         NODE_ENV=test
         EOF
 
+    - name: Wait for MongoDB
+      run: |
+        until nc -z localhost 27017; do
+          echo "Waiting for MongoDB..."
+          sleep 1
+        done
+
     - name: Run tests Jest
       env:
-        # On utilise l'URL avec authentification définie dans le service mongo plus haut
-        MONGO_URL: mongodb://admin:password@localhost:27017/car_rental_test?authSource=admin
+        MONGO_URL: mongodb://localhost:27017/car_rental_test
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         NODE_ENV: test
@@ -72,7 +71,7 @@ jobs:
     - name: Build Docker Image
       run: docker compose build
 
-    # Le déploiement reste commenté jusqu'à ce que tu sois prêt
+    # Le déploiement reste commenté
     # - name: Deploy
     #   if: github.ref == 'refs/heads/main'
     #   env:
