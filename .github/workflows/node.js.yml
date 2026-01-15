@@ -47,36 +47,28 @@ jobs:
         NODE_ENV=test
         EOF
 
-    # --- 1. QUALITÉ ET COUVERTURE ---
-    - name: Run Unit Tests & Coverage
-      env:
-        NODE_ENV: test
-      run: npm run test:cov
-
-    # --- 2. INTÉGRATION ET API ---
-    - name: Run API & Integration Tests
+    # --- 1. TESTS ET COUVERTURE (Regroupés pour éviter l'erreur "No tests found") ---
+    - name: Run All Backend Tests & Coverage
       env:
         MONGO_URL: mongodb://localhost:27017/car_rental_test
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         NODE_ENV: test
-      run: |
-        npm run test:api
-        npm run test:integration
+      run: npm test # Lance 'jest --coverage' qui trouvera tes 6 tests dans __tests__
 
-    # --- 3. INTERFACE UTILISATEUR (E2E) ---
+    # --- 2. INTERFACE UTILISATEUR (E2E) ---
     - name: Run Playwright tests
       run: npx playwright test 
 
-    # --- 4. PERFORMANCE ET LATENCE ---
+    # --- 3. PERFORMANCE CHECK ---
     - name: Performance Check
       run: |
         npm start & 
         sleep 5
-        RESPONSE_TIME=$(curl -o /dev/null -s -w "%{time_total}\n" http://localhost:3000/api/cars || echo "0")
-        echo "Temps de réponse API: ${RESPONSE_TIME}s"
+        RESPONSE_TIME=$(curl -o /dev/null -s -w "%{time_total}\n" http://localhost:3000/ || echo "0")
+        echo "Temps de réponse Accueil: ${RESPONSE_TIME}s"
 
-    # --- 5. SAUVEGARDE DES RAPPORTS (ARTEFACTS) ---
+    # --- 4. SAUVEGARDE DES RAPPORTS ---
     - name: Upload Test Reports
       if: always()
       uses: actions/upload-artifact@v4
@@ -85,20 +77,15 @@ jobs:
         path: |
           coverage/
           playwright-report/
-          test-results/
         retention-days: 7
 
     - name: Build Docker Image
       run: docker compose build
 
-    # --- 6. DÉPLOIEMENT AUTOMATIQUE ---
+    # --- 5. DÉPLOIEMENT ---
     - name: Deploy to Render
       if: github.ref == 'refs/heads/main'
       env:
         deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
       run: |
-        echo "Pipeline validée avec succès. Déclenchement du déploiement..."
         curl "$deploy_url"
-
-
-        
