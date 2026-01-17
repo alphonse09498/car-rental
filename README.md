@@ -1,7 +1,7 @@
-# Projet Groupe 11 - API Express
+# Projet Groupe 3 - API Express
 
 ## Description
-Ce projet est une API développée avec Express.js. Elle permet de gérer des fonctionnalités spécifiques définies par le groupe de TP GL 11.
+Ce projet est une API développée avec Express.js. Elle permet de gérer des fonctionnalités spécifiques définies par le groupe de TP de Cloud Computing  le but est d'implementer un pipeline de CI/CD.
 
 ## Prérequis
 Avant de lancer l'API, assurez-vous d'avoir les éléments suivants installés sur votre machine :
@@ -16,7 +16,7 @@ Avant de lancer l'API, assurez-vous d'avoir les éléments suivants installés s
 
 2. Accédez au dossier du projet :
     ```bash
-    cd Projet-Groupe11-Testing
+    cd Projet-Group 3-CLoud
     ```
 
 3. Installez les dépendances nécessaires :
