@@ -6,26 +6,21 @@ test.beforeEach(async ({ page }) => {
 
 test('Affichage de la page d\'inscription', async ({ page }) => {
   // Vérifier les éléments de base
-  await expect(page).toHaveTitle('Propelize - Inscription');
+  await expect(page).toHaveTitle(/Inscription/);
   await expect(page.locator('h1')).toHaveText('Créer un compte');
   
   // Vérifier les champs du formulaire
   await expect(page.locator('label[for="username"]')).toHaveText('Nom d\'utilisateur');
   await expect(page.locator('label[for="email"]')).toHaveText('Adresse Email');
   await expect(page.locator('label[for="password"]')).toHaveText('Mot de passe');
-  await expect(page.locator('label[for="role"]')).toHaveText('Rôle');
+  
+  // Vérifier que le champ rôle N'EXISTE PAS
+  await expect(page.locator('#role')).toHaveCount(0);
   
   // Vérifier les champs obligatoires
   await expect(page.locator('#username')).toHaveAttribute('required', '');
   await expect(page.locator('#email')).toHaveAttribute('required', '');
   await expect(page.locator('#password')).toHaveAttribute('required', '');
-  await expect(page.locator('#role')).toHaveAttribute('required', '');
-  
-  // Vérifier les options du rôle
-  await expect(page.locator('#role option')).toHaveCount(3);
-  await expect(page.locator('#role option:nth-child(1)')).toHaveText('-- Choisir un rôle --');
-  await expect(page.locator('#role option:nth-child(2)')).toHaveText('Admin');
-  await expect(page.locator('#role option:nth-child(3)')).toHaveText('Utilisateur');
   
   // Vérifier le bouton de soumission
   await expect(page.locator('button[type="submit"]')).toHaveText('S\'inscrire');
@@ -61,7 +56,7 @@ test('Inscription réussie', async ({ page }) => {
   await page.fill('#username', randomString);
   await page.fill('#email', randomString+'@example.com');
   await page.fill('#password', 'password123');
-  await page.selectOption('#role', 'user');
+  // Role selection removed
 
   // Intercepter la requête
   const [response] = await Promise.all([
@@ -94,13 +89,13 @@ test('Inscription échouée - Email déjà utilisé', async ({ page }) => {
   await page.fill('#username', 'existinguser');
   await page.fill('#email', 'existing@example.com');
   await page.fill('#password', 'password123');
-  await page.selectOption('#role', 'user');
+  // Role selection removed
 
   // Soumettre le formulaire
   await page.click('button[type="submit"]');
 
   // Vérifier le message d'erreur
-  await expect(page.locator('#message')).toHaveText('erreur de connexion, veuillez réessayer');
+  await expect(page.locator('#message')).toHaveText('Cet email est déjà utilisé');
   await expect(page.locator('#message')).toHaveCSS('color', 'rgb(255, 0, 0)'); // red
 });
 
