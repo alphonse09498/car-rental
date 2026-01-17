@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Propelize - Gestion de Véhicules</title>
+  <title>MOTORS- Gestion de Véhicules</title>
   <style>
     :root {
       --primary-color: #3498db;
@@ -40,6 +40,9 @@
       font-size: 1.8rem;
       font-weight: bold;
       color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     nav ul {
@@ -117,7 +120,7 @@
     }
     
     .feature-card {
-      background-color: rgb(231, 18, 18);
+      background-color: white;
       border-radius: 8px;
       padding: 2rem;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -165,7 +168,10 @@
 </head>
 <body>
   <header>
-    <div class="logo">Propelize</div>
+    <div class="logo">
+      <img src="/images/voiture_logo.png" alt="MOTORS Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
+      MOTORS
+    </div>
     <nav>
       <ul>
         <li><a href="/login">Connexion</a></li>
@@ -177,7 +183,10 @@
 
   <section class="hero">
     <h1>Gestion de Véhicules Simplifiée</h1>
-    <p>Propelize est une solution complète pour gérer votre parc automobile avec efficacité et simplicité. Suivi, maintenance et gestion des utilisateurs en un seul endroit.</p>
+    <div style="margin: 1.5rem 0;">
+      <img src="/images/hotesse.jpg" alt="Notre équipe à votre service" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,255,255,0.7); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+    </div>
+        <p>MOTORS est une solution complète pour gérer votre parc automobile avec efficacité et simplicité. Suivi, maintenance et gestion des utilisateurs en un seul endroit.</p>
     <a href="/register" class="btn">Commencer maintenant</a>
   </section>
 
@@ -187,16 +196,16 @@
 
       
       <div class="feature-card">
-        <div class="feature-icon">👥</div>
+        <div class="feature-icon"><img src="/images/user_icon.jpg" alt="Utilisateurs" style="width: 50px; height: 50px;"></div>
         <h3>Gestion des Utilisateurs</h3>
         <p>Contrôlez les accès avec des rôles personnalisés pour chaque membre de votre équipe.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feature-icon">🚗</div>
+        <div class="feature-icon"><img src="/images/car_icon.jpg" alt="Véhicules" style="width: 50px; height: 50px;"></div>
         <h3>Gestion des Véhicules</h3>
         <p>Ajouter modifier , mettre a jour ensemble de vos vehicules.</p>
-    </div>
+      </div>
   
   </section>
 

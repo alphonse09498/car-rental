@@ -29,6 +29,7 @@ app.use(morgan('combined'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'frontend/public')));
+app.use('/images', express.static(path.join(__dirname, 'frontend/images')));
 setupSwagger(app);
 
 // Routes
@@ -47,6 +48,10 @@ app.get('/users', (req, res) => {
 
 app.get('/vehicules', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/public/vehicles.html'));
+}); 
+
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/public/about.html'));
 }); 
 app.get('/vehicles/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/public/vehicle.html'));

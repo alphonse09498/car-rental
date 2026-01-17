@@ -1,0 +1,131 @@
+================================================================================
+DOCUMENTATION DU PROJET : MOTORS (CAR-RENTAL)
+================================================================================
+
+1. PRÉSENTATION DU PROJET
+--------------------------------------------------------------------------------
+MOTORS est une application web de gestion et de location de véhicules développée
+dans le cadre du cours de Cloud Computing (Master 2) par le Groupe 11.
+
+L'application fournit une API REST complète pour gérer les utilisateurs et les
+véhicules, ainsi qu'une interface frontend basique pour visualiser les fonctionnalités.
+
+L'objectif principal est de gérer :
+- L'authentification des utilisateurs (Inscription, Connexion).
+- Le parc automobile (Ajout, modification, suppression, listage des véhicules).
+- Les utilisateurs (Rôles, accès).
+
+2. ARCHITECTURE TECHNIQUE ET STACK
+--------------------------------------------------------------------------------
+Le projet repose sur une architecture MVC (Modèle-Vue-Contrôleur) classique.
+
+Backend :
+- Environnement : Node.js
+- Framework : Express.js (v5.1.0)
+- Base de données : MongoDB (avec ODM Mongoose)
+- Sécurité : Helmet, CORS, JWT (JSON Web Tokens), Bcryptjs (hachage mots de passe)
+- Documentation API : Swagger (swagger-jsdoc, swagger-ui-express)
+
+Frontend :
+- Technologies : HTML5, CSS3, JavaScript (Vanilla)
+- Dossier : src/frontend/public
+
+DevOps & Outils :
+- Conteneurisation : Docker, Docker Compose
+- Tests Unitaires/Intégration : Jest, Supertest, MongoDB Memory Server
+- Tests E2E (End-to-End) : Playwright
+- Analyse de code : SonarQube (sonar-scanner)
+
+3. STRUCTURE DU PROJET
+--------------------------------------------------------------------------------
+car-rental/
+├── docker-compose.yml    # Configuration des services Docker (App + Mongo)
+├── Dockerfile            # Image Docker de l'application
+├── package.json          # Dépendances et scripts NPM
+├── server.js             # Point d'entrée du serveur
+├── src/
+│   ├── app.js            # Configuration de l'application Express (Middlewares)
+│   ├── config/           # Configuration (ex: Swagger)
+│   ├── controller/       # Logique métier (Auth, Vehicle, Loop)
+│   ├── models/           # Schémas de données Mongoose (User, Vehicle)
+│   ├── routes/           # Définitions des routes API
+│   ├── services/         # (Optionnel) Logique métier complexe
+│   ├── utils/            # Utilitaires (AppError, Seeds)
+│   ├── middlewares/      # Middlewares personnalisés (Auth)
+│   └── frontend/
+│       ├── public/       # Fichiers statiques (HTML, CSS, JS)
+│       └── images/       # Ressources images
+├── tests/                # Tests E2E Playwright
+└── styles/               # (Obsolète ou spécifique)
+
+4. INSTALLATION ET DÉMARRAGE
+--------------------------------------------------------------------------------
+
+Prérequis :
+- Node.js (v18+)
+- MongoDB (local ou via Docker)
+- Docker & Docker Compose (recommandé)
+
+A. Via Docker (Recommandé) :
+   1. Créez un fichier .env à la racine (voir section Configuration).
+   2. Lancez les conteneurs :
+      > docker-compose up --build
+   3. L'application est accessible sur : http://localhost:3000
+
+B. En local (Sans Docker) :
+   1. Installez les dépendances :
+      > npm install
+   2. Configurez votre base MongoDB locale.
+   3. Lancez le serveur :
+      > npm run dev
+   4. Accédez à : http://localhost:3000
+
+5. SCRIPTS DISPONIBLES
+--------------------------------------------------------------------------------
+- npm start            : Lance le serveur en production (node server.js)
+- npm run dev          : Lance le serveur en mode développement (nodemon)
+- npm test             : Lance les tests Jest avec couverture
+- npm run test:watch   : Lance les tests en mode écoute (watch)
+- npm run test:api     : Lance uniquement les tests API
+- npm run sonar        : Lance l'analyse SonarQube
+
+6. DOCUMENTATION DE L'API (ROUTES PRINCIPALES)
+--------------------------------------------------------------------------------
+Une documentation interactive Swagger est disponible (une fois le serveur lancé)
+généralement sur la route : /api-docs (à vérifier selon config/swagger.js).
+
+Routes Authentification (/auth) :
+- POST /auth/register  : Créer un nouveau compte
+- POST /auth/login     : Se connecter (retourne un Token JWT)
+
+Routes Véhicules (/vehicles) :
+- GET /vehicles        : Lister tous les véhicules
+- POST /vehicles       : Ajouter un véhicule (nécessite Auth)
+- GET /vehicles/:id    : Détails d'un véhicule
+- PUT /vehicles/:id    : Mettre à jour un véhicule
+- DELETE /vehicles/:id : Supprimer un véhicule
+
+Routes Frontend (Vue) :
+- GET /                : Page d'accueil
+- GET /about           : Page À propos
+- GET /vehicules       : Page liste des véhicules
+- GET /users           : Page liste des utilisateurs
+
+7. CONFIGURATION (.ENV)
+--------------------------------------------------------------------------------
+Le fichier .env doit contenir les variables suivantes (exemple) :
+
+PORT=3000
+MONGO_URL=mongodb://mongo:27017/car-rental (ou lien Atlas)
+JWT_SECRET=votre_secret_tres_securise
+JWT_EXPIRES_IN=24h
+
+8. MEMBRES DU GROUPE
+--------------------------------------------------------------------------------
+Groupe 11 - Master 2 Cloud Computing - UY1
+Propriétaire du dépôt : alphonse09498
+Branche actuelle de travail : kevin
+
+================================================================================
+Généré le 17 Janvier 2026
+================================================================================

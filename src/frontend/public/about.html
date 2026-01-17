@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOTORS - À propos</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .about-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+        }
+
+        .about-section h1 {
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .about-section p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/images/voiture_logo.png" alt="MOTORS Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
+            MOTORS
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/about">À propos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <section class="about-section">
+            <h1>À propos de MOTORS</h1>
+            <p>Bienvenue chez <strong>MOTORS</strong>, votre solution de confiance pour la location de véhicules.</p>
+            
+            <p>Notre mission est de simplifier vos déplacements en mettant à votre disposition une flotte variée de véhicules adaptés à tous vos besoins, que ce soit pour un voyage d'affaires, des vacances en famille ou une escapade le temps d'un week-end.</p>
+            
+            <p>Ce projet a été réalisé dans le cadre du cours de Cloud Computing  par le <strong>Groupe 3</strong>.</p>
+
+            <h2 style="margin-top: 20px; color: var(--dark-color);">Notre équipe</h2>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Gestion optimisée de la flotte</li>
+                <li>Réservation simple et rapide</li>
+                <li>Sécurité et fiabilité</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Motors - Tous droits réservés</p>
+    </footer>
+</body>
+</html>
