@@ -2,12 +2,13 @@ name: Node.js Professional CI/CD Suite
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]  # <--- Le secret est ici : "**" signifie TOUTES les branches
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
+    # ... (le reste du code reste identique jusqu'à l'étape de déploiement)
     runs-on: ubuntu-latest
 
     strategy:
