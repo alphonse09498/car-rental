@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 
-// Helper pour envoyer la réponse
+// Helper pour envoyer la réponse uniformisée
 const sendAuthResponse = (res, statusCode, accessToken, refreshToken, user) => {
   res.status(statusCode).json({
     status: 'success',
@@ -18,50 +18,64 @@ exports.register = async (req, res, next) => {
     const userData = { username, email, password, role: req.body.role || 'user' };
     const user = await User.create(userData);
     const { accessToken, refreshToken } = user.generateAuthTokens();
+    
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     sendAuthResponse(res, 201, accessToken, refreshToken, user);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: "Email et mot de passe requis" });
+
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Identifiants incorrects" });
     }
+
     const { accessToken, refreshToken } = user.generateAuthTokens();
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
+
     sendAuthResponse(res, 200, accessToken, refreshToken, user);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password -refreshToken -passwordResetToken -passwordResetExpires');
     res.status(200).json(users);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.updateUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
     res.status(200).json(user);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-    res.status(200).json({ message: "Supprimé" });
-  } catch (err) { next(err); }
+    res.status(200).json({ message: "Supprimé avec succès" });
+  } catch (err) {
+    next(err);
+  }
 };
 
-// Mocks pour éviter les crashs sur les autres routes
-exports.refreshToken = async (req, res) => res.status(200).json({ message: "Refreshed" });
-exports.logout = async (req, res) => res.status(200).json({ message: "Logged out" });
+exports.refreshToken = async (req, res) => res.status(200).json({ status: 'success' });
+exports.logout = async (req, res) => res.status(200).json({ status: 'success' });

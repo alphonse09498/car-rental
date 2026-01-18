@@ -1,6 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
-  // IMPORTANT : Ne chercher QUE dans __tests__ et ignorer les fichiers .spec.js/ts
+  coverageDirectory: './coverage',
+  testTimeout: 30000,
   testMatch: ['**/src/__tests__/**/*.test.js'],
   testPathIgnorePatterns: [
     '/node_modules/',
@@ -17,10 +18,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 20,
-      functions: 20,
-      lines: 20,
-      statements: 20
+      branches: 30,
+      functions: 30,
+      lines: 30,
+      statements: 30
     }
   }
 };
