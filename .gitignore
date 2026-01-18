@@ -42,3 +42,6 @@ coverage/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Ignore verification file
+src/__tests__/force_ci_fail.test.js
