@@ -157,11 +157,10 @@ router.post('/refresh-token', authController.refreshToken);
  *       401:
  *         description: Non autorisé
  */
-router.post('/logout', authMiddleware.protect, authController.logout);
-
 router.get('/users', authMiddleware.protect, authController.getAllUsers);
 
-router.delete('/users/:id', authMiddleware.protect, authController.getAllUsers);
+// CORRECTION ICI : Change getAllUsers par deleteUser
+router.delete('/users/:id', authMiddleware.protect, authController.deleteUser); 
 
 router.put('/users/:id', authMiddleware.protect, authController.updateUser);
 
