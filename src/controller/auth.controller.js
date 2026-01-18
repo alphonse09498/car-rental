@@ -5,14 +5,21 @@ const AppError = require('./../utils/appError');
 // Enregistrement
 exports.register = async ( req, res, next) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body; // On extrait les données
 
     if (!username) return res.status(400).json({ message: "Username requis" });
     if (!email) return res.status(400).json({ message: "Email requis" });
     if (!password) return res.status(400).json({ message: "Mot de passe requis" });
-    if (!role) return res.status(400).json({ message: "Role requis" });
 
-    const user = await User.create(req.body);
+    // On définit le rôle par défaut ici s'il n'est pas fourni
+    const userData = {
+      username,
+      email,
+      password,
+      role: req.body.role || 'user' 
+    };
+
+    const user = await User.create(userData);
     const { accessToken, refreshToken } = user.generateAuthTokens();
     
     // Sauvegarder le refreshToken en DB
