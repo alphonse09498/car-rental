@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test('Affichage de la page de login', async ({ page }) => {
   // Vérifier les éléments de base
-  await expect(page).toHaveTitle('Propelize - Connexion');
+  await expect(page).toHaveTitle('MOTORS - Connexion');
   await expect(page.locator('h1')).toHaveText('Connexion');
   await expect(page.locator('label[for="email"]')).toHaveText('Email');
   await expect(page.locator('label[for="password"]')).toHaveText('Mot de passe');
