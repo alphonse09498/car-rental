@@ -1,13 +1,14 @@
-name: Node.js Professional CI/CD Suite
+name: Node.js Professional CI/CD Suite - Groupe 3
 
 on:
   push:
-    branches: [ "**" ] # Lance le CI sur toutes les branches
+    branches: [ "**" ] # Lance le CI sur toutes les branches pour détecter les erreurs tôt
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
+    name: "Validation Technique & Tests"
     runs-on: ubuntu-latest
 
     services:
@@ -17,43 +18,61 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Nécessaire pour les commandes git avancées
+          fetch-depth: 0
 
-      - name: Use Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Tests & Coverage
+      # --- POINT 5 : TESTS UNITAIRES & COUVERTURE ---
+      - name: Run Unit Tests (Logic)
         run: npm test -- --coverage
         env:
           MONGO_URL: mongodb://localhost:27017/testdb
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
-      - name: Upload Test Report
+      # --- POINT 5 SUITE : TESTS E2E AVEC PLAYWRIGHT ---
+      # C'est cette étape qui manquait et qui laissait passer les erreurs d'inscription
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests (Interface & Inscription)
+        run: npx playwright test
+        env:
+          # On teste contre la base de données locale du workflow pour être sûr
+          MONGO_URL: mongodb://localhost:27017/testdb
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Upload Test Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: complete-test-reports
-          path: coverage/
+          path: |
+            coverage/
+            playwright-report/
 
-      # --- ÉTAPE D'AUTOMATISATION TOTALE ---
+      # --- ÉTAPE D'AUTOMATISATION (PR & AUTO-MERGE) ---
+      # Ne s'exécute que si TOUS les tests ci-dessus (Unitaires + Playwright) sont VERTS
       - name: Create and Enable Auto-Merge
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/main' && success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Crée la PR
-          gh pr create --title "Auto-PR: ${{ github.ref_name }}" --body "Automated PR from CI branch ${{ github.ref_name }}" --base main --head ${{ github.ref_name }} || echo "PR already exists"
-          # Active l'auto-fusion (merge)
+          gh pr create --title "Auto-PR: ${{ github.ref_name }}" --body "Automated PR from verified branch ${{ github.ref_name }}" --base main --head ${{ github.ref_name }} || echo "PR already exists"
           gh pr merge --auto --merge "${{ github.ref_name }}"
 
-      # --- DÉPLOIEMENT (Uniquement sur main) ---
+      # --- POINT 7 : DÉPLOIEMENT (Uniquement sur main) ---
+      # Render recevra ce signal uniquement si les tests Playwright ont réussi
       - name: Deploy to Render
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && success()
         run: |
           curl -f ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
