@@ -40,7 +40,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       # --- POINT 5 SUITE : TESTS E2E AVEC PLAYWRIGHT ---
-      # C'est cette étape qui manquait et qui laissait passer les erreurs d'inscription
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
@@ -76,3 +75,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && success()
         run: |
           curl -f ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+
+
+
+#voici notre commentaire pour le workflow CI/CD du groupe 3
